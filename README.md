@@ -1,4 +1,10 @@
-#### My handsome readme
+## daveutils package
+
+### How to install
+
+npm install daveutils
+
+### The story
 
 When I came to Node, three years ago, I started this file, utils.js, to put all the utility routines I knew I'd need. I've been programming a long time. And there are certain things you don't want to have to rewrite. So you put them in a file and when you need a new one you just add it to that file.
 

@@ -2,7 +2,7 @@
 
 ### How to install
 
-`npm install daveutils
+`npm install daveutils`
 
 ### The story
 
@@ -10,7 +10,7 @@ When I came to Node, three years ago, I started this file, utils.js, to put all 
 
 Then in April 2017 I got tired of including that file in all my projects. Not that I was replicating code, I wasn't. It was just a little bit more work than it had to be. So I made an NPM package out of it, so I could just do this:
 
-`const utils = require ("daveutils");
+`const utils = require ("daveutils");`
 
 And include it in my package.json file, and that's that. 
 

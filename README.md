@@ -1,2 +1,14 @@
-# utils
-All the JavaScript utility routines I use across all my apps, both in the browser and in Node. 
+#### My handsome readme
+
+When I came to Node, three years ago, I started this file, utils.js, to put all the utility routines I knew I'd need. I've been programming a long time. And there are certain things you don't want to have to rewrite. So you put them in a file and when you need a new one you just add it to that file.
+
+Then in April 2017 I got tired of including that file in all my projects. Not that I was replicating code, I wasn't. It was just a little bit more work than it had to be. So I made an NPM package out of it, so I could just do this:
+
+const utils = require ("daveutils");
+
+And include it in my package.json file, and that's that. 
+
+And this is that package. 
+
+Now you know the whole story! ;-)
+

@@ -1,0 +1,17 @@
+{
+	"name": "daveutils",
+	"description": "A set of JavaScript routines I was including in all my projects, so I made it into a package.",
+	"author": "Dave Winer <dave@smallpicture.com>",
+	"license": "MIT",
+	"version": "0.4.7",
+	"main": "daveutils.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/scripting/utils.git"
+		},
+	"files": [
+		"daveutils.js"
+		],
+	"dependencies" : {
+		} 
+	}

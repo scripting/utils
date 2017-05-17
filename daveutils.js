@@ -61,6 +61,7 @@ exports.stringPopExtension = stringPopExtension;
 exports.getFileModDate = getFileModDate;
 exports.getFacebookTimeString = getFacebookTimeString;
 exports.viewDate = viewDate;
+exports.sureFilePath = fsSureFilePath; //5/17/17 by DW
 
 var fs = require ("fs");
 
@@ -1179,8 +1180,36 @@ function equalStrings (s1, s2, flUnicase) { //4/7/16 by DW
 function stringInsert (source, dest, ix) { //8/8/16 by DW
 	return (dest.substr (0, ix) + source + dest.substr (ix));
 	}
-
-
-
-
+function fsSureFilePath (path, callback) { //5/17/17 by DW 
+	var splits = path.split ("/");
+	path = ""; 
+	if (splits.length > 0) {
+		function doLevel (levelnum) {
+			if (levelnum < (splits.length - 1)) {
+				path += splits [levelnum] + "/";
+				fs.exists (path, function (flExists) {
+					if (flExists) {
+						doLevel (levelnum + 1);
+						}
+					else {
+						fs.mkdir (path, undefined, function () {
+							doLevel (levelnum + 1);
+							});
+						}
+					});
+				}
+			else {
+				if (callback !== undefined) {
+					callback ();
+					}
+				}
+			}
+		doLevel (0);
+		}
+	else {
+		if (callback !== undefined) {
+			callback ();
+			}
+		}
+	}
 

@@ -1,3 +1,5 @@
+var myProductName = "daveutils", myVersion = "0.4.18";  
+
 /*  The MIT License (MIT)
 	Copyright (c) 2014-2017 Dave Winer
 	
@@ -62,8 +64,18 @@ exports.getFileModDate = getFileModDate;
 exports.getFacebookTimeString = getFacebookTimeString;
 exports.viewDate = viewDate;
 exports.sureFilePath = fsSureFilePath; //5/17/17 by DW
+exports.getRandomSnarkySlogan = getRandomSnarkySlogan; //5/24/17 by DW
+exports.encodeXml = encodeXml; //5/24/17 by DW
+exports.trimLeading = trimLeading; //6/22/17 by DW
+exports.trimTrailing = trimTrailing; //6/22/17 by DW
+exports.stringInsert = stringInsert; //6/25/17 by DW
+exports.downloadBigFile = downloadBigFile; //7/22/17 by DW
+exports.httpExt2MIME = httpExt2MIME; //7/22/17 by DW
+exports.isFolder = fsIsFolder; //7/26/17 by DW
+exports.daysInMonth = daysInMonth; //7/31/17 by DW
 
-var fs = require ("fs");
+const fs = require ("fs");
+const request = require ("request"); //7/22/17 by DW
 
 function sameDay (d1, d2) { 
 	//returns true if the two dates are on the same day
@@ -698,7 +710,9 @@ function getRandomSnarkySlogan () { //8/15/14 by DW
 		"People return to places that send them away.",
 		"This is unfortunate and we're stuck with it forever.",
 		"You can fake caring, but you can't fake showing up.",
-		"Use your mind!"
+		"Use your mind!",
+		"Slow down to hurry up",
+		"Good morning sports fans!"
 		]
 	return (snarkySlogans [random (0, snarkySlogans.length - 1)]);
 	}
@@ -1211,5 +1225,34 @@ function fsSureFilePath (path, callback) { //5/17/17 by DW
 			callback ();
 			}
 		}
+	}
+function downloadBigFile (url, f, pubDate, callback) { //7/22/17 by DW
+	fsSureFilePath (f, function () {
+		var theStream = fs.createWriteStream (f);
+		theStream.on ("finish", function () {
+			if (pubDate === undefined) {
+				pubDate = new Date ();
+				}
+			else {
+				pubDate = new Date (pubDate);
+				}
+			fs.utimes (f, pubDate, pubDate, function () {
+				});
+			if (callback !== undefined) {
+				callback ();
+				}
+			});
+		request.get (url)
+			.on ('error', function (err) {
+				console.log (err);
+				})
+			.pipe (theStream);
+		});
+	}
+function fsIsFolder (path) { //7/26/17 by DW
+	return (fs.statSync (path).isDirectory ());
+	}
+function daysInMonth (theDay) { //7/31/17 by DW
+	return (new Date (theDay.getYear (), theDay.getMonth () + 1, 0).getDate ());
 	}
 

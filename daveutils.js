@@ -1,4 +1,4 @@
-var myProductName = "daveutils", myVersion = "0.4.18";  
+var myProductName = "daveutils", myVersion = "0.4.20";  
 
 /*  The MIT License (MIT)
 	Copyright (c) 2014-2017 Dave Winer
@@ -73,6 +73,8 @@ exports.downloadBigFile = downloadBigFile; //7/22/17 by DW
 exports.httpExt2MIME = httpExt2MIME; //7/22/17 by DW
 exports.isFolder = fsIsFolder; //7/26/17 by DW
 exports.daysInMonth = daysInMonth; //7/31/17 by DW
+exports.sureFilePathSync = fsSureFilePathSync; //8/3/17 by DW
+exports.sureFolder = fsSureFolder; //8/3/17 by DW
 
 const fs = require ("fs");
 const request = require ("request"); //7/22/17 by DW
@@ -1254,5 +1256,29 @@ function fsIsFolder (path) { //7/26/17 by DW
 	}
 function daysInMonth (theDay) { //7/31/17 by DW
 	return (new Date (theDay.getYear (), theDay.getMonth () + 1, 0).getDate ());
+	}
+function fsSureFilePathSync (path) { //8/3/17 by DW
+	var splits = path.split ("/");
+	path = ""; 
+	if (splits.length > 0) {
+		function doLevel (levelnum) {
+			if (levelnum < (splits.length - 1)) {
+				path += splits [levelnum] + "/";
+				if (fs.existsSync (path)) {
+					doLevel (levelnum + 1);
+					}
+				else {
+					fs.mkdirSync (path, undefined);
+					doLevel (levelnum + 1);
+					}
+				}
+			}
+		doLevel (0);
+		}
+	return (true);
+	}
+function fsSureFolder (folder, callback) { //8/3/17 by DW
+	fsSureFilePath (folder + "x", callback);
+	return (folder);
 	}
 

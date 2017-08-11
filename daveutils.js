@@ -1,4 +1,4 @@
-var myProductName = "daveutils", myVersion = "0.4.20";  
+var myProductName = "daveutils", myVersion = "0.4.21";  
 
 /*  The MIT License (MIT)
 	Copyright (c) 2014-2017 Dave Winer
@@ -75,6 +75,7 @@ exports.isFolder = fsIsFolder; //7/26/17 by DW
 exports.daysInMonth = daysInMonth; //7/31/17 by DW
 exports.sureFilePathSync = fsSureFilePathSync; //8/3/17 by DW
 exports.sureFolder = fsSureFolder; //8/3/17 by DW
+exports.runAtTopOfMinute = runAtTopOfMinute; //8/11/17 by DW
 
 const fs = require ("fs");
 const request = require ("request"); //7/22/17 by DW
@@ -1280,5 +1281,8 @@ function fsSureFilePathSync (path) { //8/3/17 by DW
 function fsSureFolder (folder, callback) { //8/3/17 by DW
 	fsSureFilePath (folder + "x", callback);
 	return (folder);
+	}
+function runAtTopOfMinute (callback) { //8/11/17 by DW
+	setTimeout (callback, (60 - new Date ().getSeconds ()) * 1000);
 	}
 

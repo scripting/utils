@@ -18,3 +18,9 @@ And this is that package.
 
 Now you know the whole story! ;-)
 
+PS: I wrote about daveutils <a href="http://scripting.com/2017/08/11.html#a092250">on my blog</a>. 
+
+### Questions, comments
+
+Please post an <a href="https://github.com/scripting/utils/issues">issue</a> here.
+

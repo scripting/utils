@@ -1,4 +1,4 @@
-var myProductName = "daveutils", myVersion = "0.4.23";  
+var myProductName = "daveutils", myVersion = "0.4.24";  
 
 /*  The MIT License (MIT)
 	Copyright (c) 2014-2017 Dave Winer
@@ -77,6 +77,7 @@ exports.sureFilePathSync = fsSureFilePathSync; //8/3/17 by DW
 exports.sureFolder = fsSureFolder; //8/3/17 by DW
 exports.runAtTopOfMinute = runAtTopOfMinute; //8/11/17 by DW
 exports.visitDirectory = visitDirectory; //8/30/17 by DW
+exports.decodeXml = decodeXml; //1/10/18 by DW
 
 const fs = require ("fs");
 const request = require ("request"); //7/22/17 by DW
@@ -1128,7 +1129,13 @@ function getAppUrl () { //11/13/15 by DW
 	url = stringNthField (url, "#", 1);
 	return (url);
 	}
-function getFacebookTimeString (when) { //11/13/15 by DW
+function getFacebookTimeString (when, flLongStrings) { //11/13/15 by DW
+	
+	var theStrings = [" min", " hr"]; //9/29/17 by DW
+	if (flLongStrings) {
+		theStrings = [" minute", " hour"];
+		}
+	
 	when = new Date (when); //make sure it's a date
 	var ctsecs = secondsSince (when), ct, s;
 	if (ctsecs < 60) {
@@ -1138,7 +1145,7 @@ function getFacebookTimeString (when) { //11/13/15 by DW
 	var ctminutes = ctsecs / 60;
 	if (ctminutes < 60) {
 		ct = Math.floor (ctminutes);
-		s = ct + " min";
+		s = ct + theStrings [0]; //" min";
 		if (ct != 1) {
 			s += "s";
 			}
@@ -1148,7 +1155,7 @@ function getFacebookTimeString (when) { //11/13/15 by DW
 	var cthours = ctminutes / 60;
 	if (cthours < 24) {
 		ct = Math.floor (cthours);
-		s = ct + " hr";
+		s = ct + theStrings [1]; //" hr";
 		if (ct != 1) {
 			s += "s";
 			}

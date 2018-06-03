@@ -1,4 +1,4 @@
-var myProductName = "daveutils", myVersion = "0.4.24";  
+var myProductName = "daveutils", myVersion = "0.4.26";  
 
 /*  The MIT License (MIT)
 	Copyright (c) 2014-2017 Dave Winer
@@ -78,6 +78,7 @@ exports.sureFolder = fsSureFolder; //8/3/17 by DW
 exports.runAtTopOfMinute = runAtTopOfMinute; //8/11/17 by DW
 exports.visitDirectory = visitDirectory; //8/30/17 by DW
 exports.decodeXml = decodeXml; //1/10/18 by DW
+exports.isWhitespace = isWhitespace; //6/3/18 by DW
 
 const fs = require ("fs");
 const request = require ("request"); //7/22/17 by DW
@@ -489,7 +490,7 @@ function readHttpFile (url, callback, timeoutInMilliseconds, headers) { //5/27/1
 		});
 	}
 function readHttpFileThruProxy (url, type, callback) { //10/25/14 by DW
-	var urlReadFileApi = "http://pub2.fargo.io/httpReadUrl"; //"http://pub2.fargo.io:5347/httpReadUrl";
+	var urlReadFileApi = "http://httpproxy.scripting.com/httpReadUrl"; 
 	if (type === undefined) {
 		type = "text/plain";
 		}

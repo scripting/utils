@@ -1,4 +1,4 @@
-var myProductName = "daveutils", myVersion = "0.4.26";  
+var myProductName = "daveutils", myVersion = "0.4.27";  
 
 /*  The MIT License (MIT)
 	Copyright (c) 2014-2017 Dave Winer
@@ -717,8 +717,9 @@ function getRandomSnarkySlogan () { //8/15/14 by DW
 		"This is unfortunate and we're stuck with it forever.",
 		"You can fake caring, but you can't fake showing up.",
 		"Use your mind!",
-		"Slow down to hurry up",
-		"Good morning sports fans!"
+		"Slow down to hurry up.",
+		"Good morning sports fans!",
+		"All of this has happened before and all of this will happen again."
 		]
 	return (snarkySlogans [random (0, snarkySlogans.length - 1)]);
 	}

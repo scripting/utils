@@ -1,4 +1,4 @@
-var myProductName = "daveutils", myVersion = "0.4.27";  
+var myProductName = "daveutils", myVersion = "0.4.29";  
 
 /*  The MIT License (MIT)
 	Copyright (c) 2014-2017 Dave Winer
@@ -561,8 +561,15 @@ function encodeXml (s) { //7/15/14 by DW
 		return escaped;
 		}
 	}
-function decodeXml (s) { //11/7/14 by DW
-	return (s.replace (/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&'));
+function decodeXml (s) { //7/5/18 by DW -- rewrite
+	var replacetable = {
+		lt: "<",
+		gt: ">",
+		amp: "&",
+		apos: "'"
+		};
+	s = multipleReplaceAll (s, replacetable, true, "&", ";");
+	return (s);
 	}
 function hotUpText (s, url) { //7/18/14 by DW
 	
@@ -719,7 +726,8 @@ function getRandomSnarkySlogan () { //8/15/14 by DW
 		"Use your mind!",
 		"Slow down to hurry up.",
 		"Good morning sports fans!",
-		"All of this has happened before and all of this will happen again."
+		"All of this has happened before and all of this will happen again.",
+		"Don't make me laugh."
 		]
 	return (snarkySlogans [random (0, snarkySlogans.length - 1)]);
 	}

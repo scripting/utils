@@ -1,4 +1,4 @@
-var myProductName = "daveutils", myVersion = "0.4.29";  
+var myProductName = "daveutils", myVersion = "0.4.31";  
 
 /*  The MIT License (MIT)
 	Copyright (c) 2014-2017 Dave Winer
@@ -76,9 +76,11 @@ exports.daysInMonth = daysInMonth; //7/31/17 by DW
 exports.sureFilePathSync = fsSureFilePathSync; //8/3/17 by DW
 exports.sureFolder = fsSureFolder; //8/3/17 by DW
 exports.runAtTopOfMinute = runAtTopOfMinute; //8/11/17 by DW
+exports.runEveryMinute = runEveryMinute; //9/4/18 by DW
 exports.visitDirectory = visitDirectory; //8/30/17 by DW
 exports.decodeXml = decodeXml; //1/10/18 by DW
 exports.isWhitespace = isWhitespace; //6/3/18 by DW
+exports.buildParamList = buildParamList; //9/22/18 by DW
 
 const fs = require ("fs");
 const request = require ("request"); //7/22/17 by DW
@@ -1303,6 +1305,12 @@ function fsSureFolder (folder, callback) { //8/3/17 by DW
 function runAtTopOfMinute (callback) { //8/11/17 by DW
 	setTimeout (callback, (60 - new Date ().getSeconds ()) * 1000);
 	}
+function runEveryMinute (callback) { //9/4/18 by DW
+	runAtTopOfMinute (function () {
+		setInterval (callback, 60000); 
+		callback ();
+		});
+	}
 function visitDirectory (folder, callback) { //8/30/17 by DW
 	if (!endsWith (folder, "/")) {
 		folder += "/";
@@ -1321,5 +1329,15 @@ function visitDirectory (folder, callback) { //8/30/17 by DW
 				}
 			});
 		});
+	}
+function buildParamList (paramtable) { //9/22/18 by DW 
+	var s = "";
+	for (var x in paramtable) {
+		if (s.length > 0) {
+			s += "&";
+			}
+		s += x + "=" + encodeURIComponent (paramtable [x]);
+		}
+	return (s);
 	}
 

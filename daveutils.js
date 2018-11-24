@@ -1,4 +1,4 @@
-var myProductName = "daveutils", myVersion = "0.4.31";  
+var myProductName = "daveutils", myVersion = "0.4.32";  
 
 /*  The MIT License (MIT)
 	Copyright (c) 2014-2017 Dave Winer
@@ -81,6 +81,7 @@ exports.visitDirectory = visitDirectory; //8/30/17 by DW
 exports.decodeXml = decodeXml; //1/10/18 by DW
 exports.isWhitespace = isWhitespace; //6/3/18 by DW
 exports.buildParamList = buildParamList; //9/22/18 by DW
+exports.equalStrings = equalStrings; //11/18/18 by DW
 
 const fs = require ("fs");
 const request = require ("request"); //7/22/17 by DW
@@ -389,6 +390,9 @@ function replaceAll (s, searchfor, replacewith) {
 	}
 function stringCountFields (s, chdelim) {
 	var ct = 1;
+	if (s === undefined) { //11/15/18 by DW
+		return (0);
+		}
 	if (s.length == 0) {
 		return (0);
 		}

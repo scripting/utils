@@ -1,4 +1,4 @@
-var myProductName = "daveutils", myVersion = "0.4.32";  
+var myProductName = "daveutils", myVersion = "0.4.37";  
 
 /*  The MIT License (MIT)
 	Copyright (c) 2014-2017 Dave Winer
@@ -82,6 +82,10 @@ exports.decodeXml = decodeXml; //1/10/18 by DW
 exports.isWhitespace = isWhitespace; //6/3/18 by DW
 exports.buildParamList = buildParamList; //9/22/18 by DW
 exports.equalStrings = equalStrings; //11/18/18 by DW
+exports.stringAddCommas = stringAddCommas; //1/28/19 by DW
+exports.urlSplitter = urlSplitter; //2/27/19 by DW
+exports.getRandomPassword = getRandomPassword; //8/17/19 by DW
+exports.howLongSinceStart = howLongSinceStart; //9/1/19 by DW
 
 const fs = require ("fs");
 const request = require ("request"); //7/22/17 by DW
@@ -733,7 +737,12 @@ function getRandomSnarkySlogan () { //8/15/14 by DW
 		"Slow down to hurry up.",
 		"Good morning sports fans!",
 		"All of this has happened before and all of this will happen again.",
-		"Don't make me laugh."
+		"Don't make me laugh.",
+		"If it doesn't have a feed it isn't a podcast.",
+		"You can't fight not-normal with normal.", //8/7/19 by DW
+		"You can't lie to a compiler.", //8/9/19 by DW
+		"One way is better than two, no matter how much better the second is.", //8/30/19 by DW
+		"There's nothing more permanent than a temporary hack." //9/1/19 by DW
 		]
 	return (snarkySlogans [random (0, snarkySlogans.length - 1)]);
 	}
@@ -1146,7 +1155,6 @@ function getAppUrl () { //11/13/15 by DW
 	return (url);
 	}
 function getFacebookTimeString (when, flLongStrings) { //11/13/15 by DW
-	
 	var theStrings = [" min", " hr"]; //9/29/17 by DW
 	if (flLongStrings) {
 		theStrings = [" minute", " hour"];
@@ -1187,7 +1195,12 @@ function getFacebookTimeString (when, flLongStrings) { //11/13/15 by DW
 	if (when.getFullYear () != now.getFullYear ()) {
 		formatstring += ", %Y";
 		}
-	return (formatDate (when, formatstring));
+	try {
+		return (formatDate (when, formatstring));
+		}
+	catch (err) {
+		return ("");
+		}
 	}
 function stringUpper (s) { //11/15/15 by DW
 	if (s === undefined) {
@@ -1343,5 +1356,61 @@ function buildParamList (paramtable) { //9/22/18 by DW
 		s += x + "=" + encodeURIComponent (paramtable [x]);
 		}
 	return (s);
+	}
+function howLongSinceStart (whenStart) { //8/10/19 by DW
+	function daysInYear (year) {
+		var flLeapYear = ((year % 400) == 0) || ((year % 100) != 0 && ((year % 4) == 0));
+		return ((flLeapYear) ? 366 : 365);
+		}
+	function daysInMonth (month, year) { 
+		return (new Date (year, month, 0).getDate ()); 
+		} 
+	function getnum (num, units) {
+		if (num != 1) {
+			units += "s";
+			}
+		return (num + " " + units);
+		}
+	const ctSecsInDay = 60 * 60 * 24;
+	const ctMilliSecsInDay = 1000 * ctSecsInDay;
+	const now = new Date ();
+	var theYear = whenStart.getFullYear ();
+	var ctDays = (now - whenStart) / ctMilliSecsInDay;
+	var ctYears = 0;
+	while (true) {
+		if (ctDays <= daysInYear (theYear)) {
+			break;
+			}
+		ctDays -= daysInYear (theYear);
+		ctYears++;
+		theYear++;
+		}
+	
+	var theMonth = 0, ctMonths = 0;
+	while (true) {
+		
+		if (ctDays < daysInMonth (theMonth, theYear)) {
+			break;
+			}
+		ctDays -= daysInMonth (theMonth, theYear);
+		ctMonths++;
+		theMonth++;
+		}
+	
+	const ctWholeDays = Math.floor (ctDays);
+	var ctRemainingSecs = (ctDays - ctWholeDays) * ctSecsInDay;
+	var ctHours = Math.floor (ctRemainingSecs / (60 * 60));
+	ctRemainingSecs -= ctHours * 60 * 60;
+	var ctMinutes = Math.floor (ctRemainingSecs / 60);
+	ctRemainingSecs -= ctMinutes * 60;
+	ctRemainingSecs = Math.floor (ctRemainingSecs);
+	return ({
+		years: ctYears,
+		months: ctMonths,
+		days: ctWholeDays,
+		hours: ctHours,
+		minutes: ctMinutes,
+		seconds: ctRemainingSecs
+		});
 	}
 

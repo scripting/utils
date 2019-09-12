@@ -1,4 +1,4 @@
-var myProductName = "daveutils", myVersion = "0.4.37";  
+var myProductName = "daveutils", myVersion = "0.4.40";  
 
 /*  The MIT License (MIT)
 	Copyright (c) 2014-2017 Dave Winer
@@ -85,7 +85,8 @@ exports.equalStrings = equalStrings; //11/18/18 by DW
 exports.stringAddCommas = stringAddCommas; //1/28/19 by DW
 exports.urlSplitter = urlSplitter; //2/27/19 by DW
 exports.getRandomPassword = getRandomPassword; //8/17/19 by DW
-exports.howLongSinceStart = howLongSinceStart; //9/1/19 by DW
+exports.howLongSinceStart = howLongSinceStart; //9/1/19 by DW 
+exports.howLongSinceStartAsString = howLongSinceStartAsString; //9/12/19 by DW 
 
 const fs = require ("fs");
 const request = require ("request"); //7/22/17 by DW
@@ -1412,5 +1413,15 @@ function howLongSinceStart (whenStart) { //8/10/19 by DW
 		minutes: ctMinutes,
 		seconds: ctRemainingSecs
 		});
+	}
+function howLongSinceStartAsString (whenStart) { //9/12/19 by DW
+	var x = howLongSinceStart (new Date (whenStart));
+	function getnum (num, units) {
+		if (num != 1) {
+			units += "s";
+			}
+		return (num + " " + units);
+		}
+	return (getnum (x.years, "year") + ", " + getnum (x.months, "month") + ", " + getnum (x.days, "day") + ", " + getnum (x.hours, "hour") + ", " + getnum (x.minutes, "minute") + ", " + getnum (x.seconds, "second") + ".");
 	}
 

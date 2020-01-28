@@ -1,4 +1,4 @@
-var myProductName = "daveutils", myVersion = "0.4.40";  
+var myProductName = "daveutils", myVersion = "0.4.43";  
 
 /*  The MIT License (MIT)
 	Copyright (c) 2014-2019 Dave Winer
@@ -321,6 +321,9 @@ function addPeriodAtEnd (s) {
 function getBoolean (val) { //12/5/13 by DW
 	switch (typeof (val)) {
 		case "string":
+			if (val == "1") { //1/28/20 by DW
+				return (true);
+				}
 			if (val.toLowerCase () == "true") {
 				return (true);
 				}
@@ -662,8 +665,9 @@ function innerCaseName (text) { //8/12/14 by DW
 		}
 	return (s);
 	}
-function hitCounter (counterGroup, counterServer, thisPageUrl, referrer) { //8/12/14 by DW
-	var defaultCounterGroup = "scripting", defaultCounterServer = "http://counter2.fargo.io:5337/counter";
+function hitCounter (counterGroup, counterServer, thisPageUrl, referrer) { //12/17/19 by DW -- no more JSONP, simpler
+	var defaultCounterGroup = "scripting";
+	var defaultCounterServer = "http://counters.scripting.com/counter"; //9/23/19 by DW
 	if (counterGroup === undefined) {
 		counterGroup = defaultCounterGroup;
 		}
@@ -682,17 +686,9 @@ function hitCounter (counterGroup, counterServer, thisPageUrl, referrer) { //8/1
 	if (referrer === undefined) { //3/8/17 by DW -- the usual thing
 		referrer = document.referrer;
 		}
-	var jxhr = $.ajax ({
-		url: counterServer + "?group=" + encodeURIComponent (counterGroup) + "&referer=" + encodeURIComponent (referrer) + "&url=" + encodeURIComponent (thisPageUrl),
-		dataType: "jsonp",
-		jsonpCallback : "getData",
-		timeout: 30000
-		})
-	.success (function (data, status, xhr) {
-		console.log ("hitCounter: counter ping accepted by server, group == " + counterGroup + ", page url == " + thisPageUrl);
-		})
-	.error (function (status, textStatus, errorThrown) {
-		console.log ("hitCounter: counter ping error: " + textStatus);
+	var url = counterServer + "?group=" + encodeURIComponent (counterGroup) + "&referer=" + encodeURIComponent (referrer) + "&url=" + encodeURIComponent (thisPageUrl);
+	readHttpFile (url, function (msgFromServer) {
+		console.log ("hitCounter: msgFromServer == " + msgFromServer);
 		});
 	}
 function stringMid (s, ix, len) { //8/12/14 by DW
@@ -1066,6 +1062,7 @@ function httpExt2MIME (ext) { //12/24/14 by DW
 		"jpeg": "image/jpeg",
 		"jpg": "image/jpeg",
 		"js": "application/javascript",
+		"json": "application/json", //12/4/19 by DW
 		"mid": "audio/x-midi",
 		"midi": "audio/x-midi",
 		"mov": "video/quicktime",
@@ -1333,7 +1330,7 @@ function visitDirectory (folder, callback) { //8/30/17 by DW
 	if (!endsWith (folder, "/")) {
 		folder += "/";
 		}
-	sureFilePath (folder, function () {
+	fsSureFilePath (folder, function () {
 		fs.readdir (folder, function (err, list) {
 			if (err) {
 				console.log ("visitDirectory: err.message == " + err.message);

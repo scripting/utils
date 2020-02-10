@@ -1,4 +1,4 @@
-var myProductName = "daveutils", myVersion = "0.4.43";  
+var myProductName = "daveutils", myVersion = "0.4.48";  
 
 /*  The MIT License (MIT)
 	Copyright (c) 2014-2020 Dave Winer
@@ -87,6 +87,7 @@ exports.urlSplitter = urlSplitter; //2/27/19 by DW
 exports.getRandomPassword = getRandomPassword; //8/17/19 by DW
 exports.howLongSinceStart = howLongSinceStart; //9/1/19 by DW 
 exports.howLongSinceStartAsString = howLongSinceStartAsString; //9/12/19 by DW 
+exports.getPermalinkString = getPermalinkString; //2/10/20 by DW
 
 const fs = require ("fs");
 const request = require ("request"); //7/22/17 by DW
@@ -1420,5 +1421,19 @@ function howLongSinceStartAsString (whenStart) { //9/12/19 by DW
 		return (num + " " + units);
 		}
 	return (getnum (x.years, "year") + ", " + getnum (x.months, "month") + ", " + getnum (x.days, "day") + ", " + getnum (x.hours, "hour") + ", " + getnum (x.minutes, "minute") + ", " + getnum (x.seconds, "second") + ".");
+	}
+function getPermalinkString (when) { //2/10/20 by DW
+	var permalinkstring;
+	when = new Date (when);
+	permalinkstring = when.getUTCFullYear ();
+	function add (num) {
+		permalinkstring += padWithZeros (num, 2);
+		}
+	add (when.getUTCMonth ());
+	add (when.getUTCDate ());
+	add (when.getUTCHours ());
+	add (when.getUTCMinutes ());
+	add (when.getUTCSeconds ());
+	return (permalinkstring);
 	}
 

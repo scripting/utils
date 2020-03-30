@@ -1,4 +1,4 @@
-var myProductName = "daveutils", myVersion = "0.4.49";  
+var myProductName = "daveutils", myVersion = "0.4.50";  
 
 /*  The MIT License (MIT)
 	Copyright (c) 2014-2020 Dave Winer
@@ -204,6 +204,9 @@ function endsWith (s, possibleEnding, flUnicase) {
 	return (true);
 	}
 function stringContains (s, whatItMightContain, flUnicase) { //11/9/14 by DW
+	if (s === undefined) { //3/30/20 by DW
+		return (false);
+		}
 	if (flUnicase === undefined) {
 		flUnicase = true;
 		}

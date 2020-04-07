@@ -1,4 +1,4 @@
-var myProductName = "daveutils", myVersion = "0.4.50";  
+var myProductName = "daveutils", myVersion = "0.4.51";  
 
 /*  The MIT License (MIT)
 	Copyright (c) 2014-2020 Dave Winer
@@ -744,7 +744,8 @@ function getRandomSnarkySlogan () { //8/15/14 by DW
 		"You can't lie to a compiler.", //8/9/19 by DW
 		"One way is better than two, no matter how much better the second is.", //8/30/19 by DW
 		"There's nothing more permanent than a temporary hack.", //9/1/19 by DW
-		"Don't get lost in the weeds." //3/5/20 by DW
+		"Don't get lost in the weeds.", //3/5/20 by DW
+		"Wash your hands." //4/7/20 by DW
 		]
 	return (snarkySlogans [random (0, snarkySlogans.length - 1)]);
 	}

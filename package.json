@@ -3,7 +3,7 @@
 	"description": "A set of JavaScript routines I was including in all my projects, so I made it into a package.",
 	"author": "Dave Winer <dave@scripting.com>",
 	"license": "MIT",
-	"version": "0.4.53",
+	"version": "0.4.54",
 	"main": "daveutils.js",
 	"repository": {
 		"type": "git",
@@ -11,7 +11,6 @@
 		},
 	"files": [
 		"daveutils.js",
-		"utils.js",
 		"strftime.js"
 		],
 	"dependencies" : {

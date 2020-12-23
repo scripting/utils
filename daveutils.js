@@ -1,4 +1,4 @@
-var myProductName = "daveutils", myVersion = "0.4.54";  
+var myProductName = "daveutils", myVersion = "0.4.59";  
 
 /*  The MIT License (MIT)
 	Copyright (c) 2014-2020 Dave Winer
@@ -88,9 +88,123 @@ exports.getRandomPassword = getRandomPassword; //8/17/19 by DW
 exports.howLongSinceStart = howLongSinceStart; //9/1/19 by DW 
 exports.howLongSinceStartAsString = howLongSinceStartAsString; //9/12/19 by DW 
 exports.getPermalinkString = getPermalinkString; //2/10/20 by DW
+exports.getDomainFromUrl = getDomainFromUrl; //8/10/20 by DW
+exports.getPermalinkString = getPermalinkString; //12/21/20 by DW -- from River6
+exports.endsWithChar = endsWithChar; //12/21/20 by DW -- from River6
+exports.getDomainName = getDomainName; //12/21/20 by DW -- from River6
+exports.equalDates = equalDates; //12/21/20 by DW -- from River6
+exports.fsWriteStruct = fsWriteStruct; //12/21/20 by DW -- from River6
+exports.fsReadStruct = fsReadStruct; //12/21/20 by DW -- from River6
 
 const fs = require ("fs");
 const request = require ("request"); //7/22/17 by DW
+
+// version 0.11 by Daniel Rench
+// More information: http://dren.ch/strftime/
+// This is public domain software
+
+Number.prototype.pad =
+	function (n,p) {
+		var s = '' + this;
+		p = p || '0';
+		while (s.length < n) s = p + s;
+		return s;
+	};
+
+Date.prototype.months = [
+		'January', 'February', 'March', 'April', 'May', 'June', 'July',
+		'August', 'September', 'October', 'November', 'December'
+	];
+Date.prototype.weekdays = [
+		'Sunday', 'Monday', 'Tuesday', 'Wednesday',
+		'Thursday', 'Friday', 'Saturday'
+	];
+Date.prototype.dpm = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+
+Date.prototype.strftime_f = {
+		A: function (d) { return d.weekdays[d.getDay()] },
+		a: function (d) { return d.weekdays[d.getDay()].substring(0,3) },
+		B: function (d) { return d.months[d.getMonth()] },
+		b: function (d) { return d.months[d.getMonth()].substring(0,3) },
+		C: function (d) { return Math.floor(d.getFullYear()/100); },
+		c: function (d) { return d.toString() },
+		D: function (d) {
+				return d.strftime_f.m(d) + '/' +
+					d.strftime_f.d(d) + '/' + d.strftime_f.y(d);
+			},
+		d: function (d) { return d.getDate().pad(2,'0') },
+		e: function (d) { return d.getDate().pad(2,' ') },
+		F: function (d) {
+				return d.strftime_f.Y(d) + '-' + d.strftime_f.m(d) + '-' +
+					d.strftime_f.d(d);
+			},
+		H: function (d) { return d.getHours().pad(2,'0') },
+		I: function (d) { return ((d.getHours() % 12 || 12).pad(2)) },
+		j: function (d) {
+				var t = d.getDate();
+				var m = d.getMonth() - 1;
+				if (m > 1) {
+					var y = d.getYear();
+					if (((y % 100) == 0) && ((y % 400) == 0)) ++t;
+					else if ((y % 4) == 0) ++t;
+				}
+				while (m > -1) t += d.dpm[m--];
+				return t.pad(3,'0');
+			},
+		k: function (d) { return d.getHours().pad(2,' ') },
+		l: function (d) { return ((d.getHours() % 12 || 12).pad(2,' ')) },
+		M: function (d) { return d.getMinutes().pad(2,'0') },
+		m: function (d) { return (d.getMonth()+1).pad(2,'0') },
+		n: function (d) { return "\n" },
+		p: function (d) { return (d.getHours() > 11) ? 'PM' : 'AM' },
+		R: function (d) { return d.strftime_f.H(d) + ':' + d.strftime_f.M(d) },
+		r: function (d) {
+				return d.strftime_f.I(d) + ':' + d.strftime_f.M(d) + ':' +
+					d.strftime_f.S(d) + ' ' + d.strftime_f.p(d);
+			},
+		S: function (d) { return d.getSeconds().pad(2,'0') },
+		s: function (d) { return Math.floor(d.getTime()/1000) },
+		T: function (d) {
+				return d.strftime_f.H(d) + ':' + d.strftime_f.M(d) + ':' +
+					d.strftime_f.S(d);
+			},
+		t: function (d) { return "\t" },
+/*		U: function (d) { return false }, */
+		u: function (d) { return(d.getDay() || 7) },
+/*		V: function (d) { return false }, */
+		v: function (d) {
+				return d.strftime_f.e(d) + '-' + d.strftime_f.b(d) + '-' +
+					d.strftime_f.Y(d);
+			},
+/*		W: function (d) { return false }, */
+		w: function (d) { return d.getDay() },
+		X: function (d) { return d.toTimeString() }, // wrong?
+		x: function (d) { return d.toDateString() }, // wrong?
+		Y: function (d) { return d.getFullYear() },
+		y: function (d) { return (d.getYear() % 100).pad(2) },
+//		Z: function (d) { return d.toString().match(/\((.+)\)$/)[1]; },
+//		z: function (d) { return d.getTimezoneOffset() }, // wrong
+//		z: function (d) { return d.toString().match(/\sGMT([+-]\d+)/)[1]; },
+		'%': function (d) { return '%' }
+	};
+
+Date.prototype.strftime_f['+'] = Date.prototype.strftime_f.c;
+Date.prototype.strftime_f.h = Date.prototype.strftime_f.b;
+
+Date.prototype.strftime =
+	function (fmt) {
+		var r = '';
+		var n = 0;
+		while(n < fmt.length) {
+			var c = fmt.substring(n, n+1);
+			if (c == '%') {
+				c = fmt.substring(++n, n+1);
+				r += (this.strftime_f[c]) ? this.strftime_f[c](this) : c;
+			} else r += c;
+			++n;
+		}
+		return r;
+	};
 
 function sameDay (d1, d2) { 
 	//returns true if the two dates are on the same day
@@ -459,6 +573,11 @@ function maxStringLength (s, len, flWholeWordAtEnd, flAddElipses) {
 					s = s.substr (0, s.length - 1); //pop last char
 					}
 				}
+			else { //8/2/20 by DW
+				if (flAddElipses) {
+					s += "...";
+					}
+				}
 			}
 		return (s);
 		}
@@ -745,7 +864,11 @@ function getRandomSnarkySlogan () { //8/15/14 by DW
 		"One way is better than two, no matter how much better the second is.", //8/30/19 by DW
 		"There's nothing more permanent than a temporary hack.", //9/1/19 by DW
 		"Don't get lost in the weeds.", //3/5/20 by DW
-		"Wash your hands." //4/7/20 by DW
+		"Wash your hands.", //4/7/20 by DW
+		"Wear a mask.", //7/4/20 by DW
+		"Choose to not be offended.", //7/4/20 by DW
+		"An ounce of prevention is worth a pound of cure.", //7/8/20 by DW
+		"If you don't like the news, go out and make some of your own." //11/28/20 by DW
 		]
 	return (snarkySlogans [random (0, snarkySlogans.length - 1)]);
 	}
@@ -1440,5 +1563,64 @@ function getPermalinkString (when) { //2/10/20 by DW
 	add (when.getUTCMinutes ());
 	add (when.getUTCSeconds ());
 	return (permalinkstring);
+	}
+function endsWithChar (s, chPossibleEndchar) { //12/21/20 by DW -- from River6
+	if ((s === undefined) || (s.length == 0)) { 
+		return (false);
+		}
+	else {
+		return (s [s.length - 1] == chPossibleEndchar);
+		}
+	}
+function getDomainName (clientIp, callback) { //12/21/20 by DW -- from River6
+	if (clientIp === undefined) {
+		if (callback !== undefined) {
+			callback ("undefined");
+			}
+		}
+	else {
+		dns.reverse (clientIp, function (err, domains) {
+			var name = clientIp;
+			if (!err) {
+				if (domains.length > 0) {
+					name = domains [0];
+					}
+				}
+			if (callback !== undefined) {
+				callback (name);
+				}
+			});
+		}
+	}
+function equalDates (d1, d2) { //12/21/20 by DW -- from River6
+	return (d1.getTime () == d2.getTime ());
+	}
+function fsWriteStruct (filepath, jstruct, callback) { //12/21/20 by DW -- from River6
+	utils.sureFilePath (filepath, function () {
+		fs.writeFile (filepath, utils.jsonStringify (jstruct), function (err) {
+			if (callback !== undefined) {
+				callback (err);
+				}
+			});
+		});
+	}
+function fsReadStruct (filepath, callback) { //12/21/20 by DW -- from River6
+	utils.sureFilePath (filepath, function () {
+		fs.readFile (filepath, function (err, data) {
+			var jstruct;
+			if (err) {
+				callback (err);
+				}
+			else {
+				try {
+					jstruct = JSON.parse (data);
+					callback (undefined, jstruct);
+					}
+				catch (err) {
+					callback (err);
+					}
+				}
+			});
+		});
 	}
 

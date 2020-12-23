@@ -3,15 +3,14 @@
 	"description": "A set of JavaScript routines I was including in all my projects, so I made it into a package.",
 	"author": "Dave Winer <dave@scripting.com>",
 	"license": "MIT",
-	"version": "0.4.54",
+	"version": "0.4.59",
 	"main": "daveutils.js",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/scripting/utils.git"
 		},
 	"files": [
-		"daveutils.js",
-		"strftime.js"
+		"daveutils.js"
 		],
 	"dependencies" : {
 		"request": "*"

@@ -1,4 +1,4 @@
-var myProductName = "daveutils", myVersion = "0.4.59";  
+var myProductName = "daveutils", myVersion = "0.4.61";  
 
 /*  The MIT License (MIT)
 	Copyright (c) 2014-2020 Dave Winer
@@ -868,7 +868,9 @@ function getRandomSnarkySlogan () { //8/15/14 by DW
 		"Wear a mask.", //7/4/20 by DW
 		"Choose to not be offended.", //7/4/20 by DW
 		"An ounce of prevention is worth a pound of cure.", //7/8/20 by DW
-		"If you don't like the news, go out and make some of your own." //11/28/20 by DW
+		"If you don't like the news, go out and make some of your own.", //11/28/20 by DW
+		"It shouldn't matter where a good idea comes from.", //1/3/21 by DW
+		"It's not like anyone gets out of this alive." //1/17/21 by DW
 		]
 	return (snarkySlogans [random (0, snarkySlogans.length - 1)]);
 	}
@@ -1449,11 +1451,27 @@ function fsSureFolder (folder, callback) { //8/3/17 by DW
 function runAtTopOfMinute (callback) { //8/11/17 by DW
 	setTimeout (callback, (60 - new Date ().getSeconds ()) * 1000);
 	}
-function runEveryMinute (callback) { //9/4/18 by DW
-	runAtTopOfMinute (function () {
-		setInterval (callback, 60000); 
-		callback ();
-		});
+function runEveryMinute (callback) { //2/14/21 AM by DW -- no drift
+	var whenLastEveryMinute = new Date ();
+	function secondsSince (when) { 
+		var now = new Date ();
+		when = new Date (when);
+		return ((now - when) / 1000);
+		}
+	function everySecond () {
+		var now = new Date ();
+		if (now.getSeconds () == 0) {
+			whenLastEveryMinute = now;
+			callback ();
+			}
+		else {
+			if (secondsSince (whenLastEveryMinute) > 60) {
+				whenLastEveryMinute = now;
+				callback ();
+				}
+			}
+		}
+	setInterval (everySecond, 1000);
 	}
 function visitDirectory (folder, callback) { //8/30/17 by DW
 	if (!endsWith (folder, "/")) {

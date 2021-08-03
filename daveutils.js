@@ -1,4 +1,4 @@
-var myProductName = "daveutils", myVersion = "0.4.61";  
+var myProductName = "daveutils", myVersion = "0.4.62";  
 
 /*  The MIT License (MIT)
 	Copyright (c) 2014-2020 Dave Winer
@@ -460,6 +460,9 @@ function bumpUrlString (s) { //5/10/14 by DW
 	if (s === undefined) {
 		s = "0";
 		}
+	if (typeof s != "string") { //6/25/21 by DW
+		s = s.toString ();
+		}
 	function bumpChar (ch) {
 		function num (ch) {
 			return (ch.charCodeAt (0));
@@ -825,7 +828,7 @@ function getCmdKeyPrefix () { //8/15/14 by DW
 		return ("Ctrl+"); 
 		}
 	}
-function getRandomSnarkySlogan () { //8/15/14 by DW
+function getRandomSnarkySlogan (flReturnArray) { //8/15/14 by DW
 	var snarkySlogans = [
 		"Good for the environment.", 
 		"All baking done on premises.", 
@@ -870,9 +873,17 @@ function getRandomSnarkySlogan () { //8/15/14 by DW
 		"An ounce of prevention is worth a pound of cure.", //7/8/20 by DW
 		"If you don't like the news, go out and make some of your own.", //11/28/20 by DW
 		"It shouldn't matter where a good idea comes from.", //1/3/21 by DW
-		"It's not like anyone gets out of this alive." //1/17/21 by DW
+		"It's not like anyone gets out of this alive.", //1/17/21 by DW
+		"Fear is frozen fun.", //5/3/21 by DW
+		"Thanks for listening.", //5/16/21 by DW
+		"You can observe a lot by watching." //7/22/21 by DW
 		]
-	return (snarkySlogans [random (0, snarkySlogans.length - 1)]);
+	if (getBoolean (flReturnArray)) {
+		return (snarkySlogans);
+		}
+	else {
+		return (snarkySlogans [random (0, snarkySlogans.length - 1)]);
+		}
 	}
 function dayOfWeekToString (theDay) { //8/23/14 by DW
 	var weekday = [
@@ -1168,7 +1179,7 @@ function httpHeadRequest (url, callback) { //12/17/14 by DW
 		callback (xhr); //you can do xhr.getResponseHeader to get one of the header elements
 		})
 	}
-function httpExt2MIME (ext) { //12/24/14 by DW
+function httpExt2MIME (ext, defaultType) { //12/24/14 by DW
 	var lowerext = stringLower (ext);
 	var map = {
 		"au": "audio/basic",
@@ -1219,7 +1230,7 @@ function httpExt2MIME (ext) { //12/24/14 by DW
 			return (map [x]);
 			}
 		}
-	return ("text/plain");
+	return ((defaultType === undefined) ? "text/plain" : defaultType);
 	}
 function kilobyteString (num) { //1/24/15 by DW
 	num = Number (num) / 1024;

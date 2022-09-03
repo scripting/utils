@@ -1,4 +1,4 @@
-var myProductName = "daveutils", myVersion = "0.4.62";  
+var myProductName = "daveutils", myVersion = "0.4.64";  
 
 /*  The MIT License (MIT)
 	Copyright (c) 2014-2020 Dave Winer
@@ -64,7 +64,7 @@ exports.getFileModDate = getFileModDate;
 exports.getFacebookTimeString = getFacebookTimeString;
 exports.viewDate = viewDate;
 exports.sureFilePath = fsSureFilePath; //5/17/17 by DW
-exports.getRandomSnarkySlogan = getRandomSnarkySlogan; //5/24/17 by DW
+exports.getRandomSnarkySlogan = getRandomSnarkySlogan; //5/24/17 by DW 
 exports.encodeXml = encodeXml; //5/24/17 by DW
 exports.trimLeading = trimLeading; //6/22/17 by DW
 exports.trimTrailing = trimTrailing; //6/22/17 by DW
@@ -95,6 +95,7 @@ exports.getDomainName = getDomainName; //12/21/20 by DW -- from River6
 exports.equalDates = equalDates; //12/21/20 by DW -- from River6
 exports.fsWriteStruct = fsWriteStruct; //12/21/20 by DW -- from River6
 exports.fsReadStruct = fsReadStruct; //12/21/20 by DW -- from River6
+exports.isUndefined = isUndefined; //11/17/21 by DW
 
 const fs = require ("fs");
 const request = require ("request"); //7/22/17 by DW
@@ -206,6 +207,9 @@ Date.prototype.strftime =
 		return r;
 	};
 
+function isUndefined (x) { //11/17/21 by DW -- don't just compare against undefined
+	return ((x === undefined) || (x == null));
+	}
 function sameDay (d1, d2) { 
 	//returns true if the two dates are on the same day
 	d1 = new Date (d1);
@@ -331,7 +335,7 @@ function stringContains (s, whatItMightContain, flUnicase) { //11/9/14 by DW
 	return (s.indexOf (whatItMightContain) != -1);
 	}
 function beginsWith (s, possibleBeginning, flUnicase) { 
-	if (s === undefined) { //7/15/15 by DW
+	if (isUndefined (s)) { //11/17/21 by DW
 		return (false);
 		}
 	if (s.length == 0) { //1/1/14 by DW
@@ -748,8 +752,11 @@ function getFavicon (url) { //7/18/14 by DW
 	var domain = getDomainFromUrl (url);
 	return ("http://www.google.com/s2/favicons?domain=" + domain);
 	};
-function getURLParameter (name) { //7/21/14 by DW
-	return (decodeURI ((RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]));
+function getURLParameter (name, url) { //7/21/14 by DW
+	if (url === undefined) { //9/4/21 by DW
+		url = location.search;
+		}
+	return (decodeURI ((RegExp(name + '=' + '(.+?)(&|$)').exec(url)||[,null])[1]));
 	}
 function urlSplitter (url) { //7/15/14 by DW
 	var pattern = /^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/;
@@ -876,7 +883,9 @@ function getRandomSnarkySlogan (flReturnArray) { //8/15/14 by DW
 		"It's not like anyone gets out of this alive.", //1/17/21 by DW
 		"Fear is frozen fun.", //5/3/21 by DW
 		"Thanks for listening.", //5/16/21 by DW
-		"You can observe a lot by watching." //7/22/21 by DW
+		"You can observe a lot by watching.", //7/22/21 by DW
+		"No one tells me anything.", //10/15/21 by DW
+		"Just passin' thru" //11/17/21 by DW
 		]
 	if (getBoolean (flReturnArray)) {
 		return (snarkySlogans);
@@ -1097,17 +1106,18 @@ function getRandomPassword (ctchars) { //10/14/14 by DW
 		}
 	return (s.toLowerCase ());
 	}
+function getMonthName (theDate) { //1/11/22 by DW
+	return (new Date (theDate).toLocaleString ("default", {month: "long"}));
+	}
 function monthToString (theMonthNum) { //11/4/14 by DW
-	
-	
 	var theDate;
 	if (theMonthNum === undefined) {
 		theDate = new Date ();
 		}
 	else {
-		theDate = new Date ((theMonthNum + 1) + "/1/2014");
+		theDate = new Date ((theMonthNum + 1) + "/2/2014");
 		}
-	return (formatDate (theDate, "%B"));
+	return (getMonthName (theDate)); //1/11/22 by DW
 	}
 function getCanonicalName (text) { //11/4/14 by DW
 	var s = "", ch, flNextUpper = false;
@@ -1209,6 +1219,7 @@ function httpExt2MIME (ext, defaultType) { //12/24/14 by DW
 		"midi": "audio/x-midi",
 		"mov": "video/quicktime",
 		"mp3": "audio/mpeg",
+		"opml": "text/xml", //8/24/21 by DW
 		"pdf": "application/pdf",
 		"png": "image/png",
 		"ppt": "application/mspowerpoint",

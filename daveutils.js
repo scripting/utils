@@ -1,7 +1,7 @@
-var myProductName = "daveutils", myVersion = "0.4.64";  
+var myProductName = "daveutils", myVersion = "0.4.69";  
 
 /*  The MIT License (MIT)
-	Copyright (c) 2014-2020 Dave Winer
+	Copyright (c) 2014-2023 Dave Winer
 	
 	Permission is hereby granted, free of charge, to any person obtaining a copy
 	of this software and associated documentation files (the "Software"), to deal
@@ -96,6 +96,11 @@ exports.equalDates = equalDates; //12/21/20 by DW -- from River6
 exports.fsWriteStruct = fsWriteStruct; //12/21/20 by DW -- from River6
 exports.fsReadStruct = fsReadStruct; //12/21/20 by DW -- from River6
 exports.isUndefined = isUndefined; //11/17/21 by DW
+exports.myConsoleLog = myConsoleLog; //10/11/23 by DW
+exports.mergeOptions = mergeOptions; //8/14/24 by DW
+exports.readConfig = readConfig; //8/14/24 by DW
+exports.pathBeginsWithNumbers = pathBeginsWithNumbers; //9/22/24 by DW
+
 
 const fs = require ("fs");
 const request = require ("request"); //7/22/17 by DW
@@ -207,7 +212,7 @@ Date.prototype.strftime =
 		return r;
 	};
 
-function isUndefined (x) { //11/17/21 by DW -- don't just compare against undefined
+function isUndefined (x) { //11/17/21 by DW -- don't just compare against undefined 
 	return ((x === undefined) || (x == null));
 	}
 function sameDay (d1, d2) { 
@@ -634,7 +639,7 @@ function readHttpFile (url, callback, timeoutInMilliseconds, headers) { //5/27/1
 		});
 	}
 function readHttpFileThruProxy (url, type, callback) { //10/25/14 by DW
-	var urlReadFileApi = "http://httpproxy.scripting.com/httpReadUrl"; 
+	var urlReadFileApi = "https://httpproxy.scripting.com/httpReadUrl"; //2/26/23 by DW
 	if (type === undefined) {
 		type = "text/plain";
 		}
@@ -750,7 +755,7 @@ function getDomainFromUrl (url) { //7/11/15 by DW
 	};
 function getFavicon (url) { //7/18/14 by DW
 	var domain = getDomainFromUrl (url);
-	return ("http://www.google.com/s2/favicons?domain=" + domain);
+	return ("//www.google.com/s2/favicons?domain=" + domain); //2/3/23 by DW
 	};
 function getURLParameter (name, url) { //7/21/14 by DW
 	if (url === undefined) { //9/4/21 by DW
@@ -800,7 +805,7 @@ function innerCaseName (text) { //8/12/14 by DW
 	}
 function hitCounter (counterGroup, counterServer, thisPageUrl, referrer) { //12/17/19 by DW -- no more JSONP, simpler
 	var defaultCounterGroup = "scripting";
-	var defaultCounterServer = "http://counters.scripting.com/counter"; //9/23/19 by DW
+	var defaultCounterServer = "//counters.scripting.com/hello"; //2/2/23 by DW
 	if (counterGroup === undefined) {
 		counterGroup = defaultCounterGroup;
 		}
@@ -885,7 +890,9 @@ function getRandomSnarkySlogan (flReturnArray) { //8/15/14 by DW
 		"Thanks for listening.", //5/16/21 by DW
 		"You can observe a lot by watching.", //7/22/21 by DW
 		"No one tells me anything.", //10/15/21 by DW
-		"Just passin' thru" //11/17/21 by DW
+		"Just passin' thru", //11/17/21 by DW
+		"There's no time like now.", //6/15/24 by DW
+		"Mirrors lie." //6/15/24 by DW
 		]
 	if (getBoolean (flReturnArray)) {
 		return (snarkySlogans);
@@ -1305,16 +1312,33 @@ function getAppUrl () { //11/13/15 by DW
 	url = stringNthField (url, "#", 1);
 	return (url);
 	}
-function getFacebookTimeString (when, flLongStrings) { //11/13/15 by DW
-	var theStrings = [" min", " hr"]; //9/29/17 by DW
-	if (flLongStrings) {
-		theStrings = [" minute", " hour"];
+function getFacebookTimeString (when, flLongStrings, callerOptions) { //4/27/24 by DW
+	function getFormattedString (when, theFormat) { //4/27/24 by DW
+		try {
+			return (formatDate (when, theFormat));
+			}
+		catch (err) {
+			return ("");
+			}
 		}
+	
+	var options = { //3/17/23 by DW
+		flBriefYearDates: false,
+		nowString: "Just now",
+		flUseYesterdayString: true //2/10/24 by DW
+		}
+	if (callerOptions !== undefined) {
+		for (var x in callerOptions) {
+			options [x] = callerOptions [x];
+			}
+		}
+	
+	const theStrings = (flLongStrings) ? [" minute", " hour"] : [" min", " hr"];
 	
 	when = new Date (when); //make sure it's a date
 	var ctsecs = secondsSince (when), ct, s;
 	if (ctsecs < 60) {
-		return ("Just now");
+		return (options.nowString);
 		}
 	
 	var ctminutes = ctsecs / 60;
@@ -1339,12 +1363,38 @@ function getFacebookTimeString (when, flLongStrings) { //11/13/15 by DW
 	
 	var now = new Date ();
 	if (sameDay (when, dateYesterday (now))) {
-		return ("Yesterday at " + formatDate (when, "%l:%M %p"));
+		if (flLongStrings) { //7/1/22 by DW
+			return ("Yesterday at " + formatDate (when, "%l:%M %p"));
+			}
+		else {
+			if (options.flUseYesterdayString) { //2/10/24 by DW
+				return ("Yesterday");
+				}
+			}
+		}
+	else { //4/27/24 by DW
+		var ctdays = cthours / 24; 
+		if (ctdays < 7) {
+			const format = (flLongStrings) ? "%A at %l:%M %p" : "%a";
+			const daystring = getFormattedString (when, format);
+			return (daystring);
+			}
 		}
 	
-	var formatstring = "%b %e";
-	if (when.getFullYear () != now.getFullYear ()) {
-		formatstring += ", %Y";
+	var formatstring;
+	if (options.flBriefYearDates) { //3/17/23 by DW
+		if (ctsecs > (364 * 60 * 60 * 24)) { //more than one year ago -- approx
+			formatstring = (flLongStrings) ? "%B %Y" : "%b %Y";  //Feb 2022
+			}
+		else {
+			formatstring = (flLongStrings) ? "%B %e" : "%b %e"; //e.g. Feb 23
+			}
+		}
+	else {
+		formatstring = (flLongStrings) ? "%B %e" : "%b %e"; //8/28/22 by DW
+		if (when.getFullYear () != now.getFullYear ()) {
+			formatstring += ", %Y";
+			}
 		}
 	try {
 		return (formatDate (when, formatstring));
@@ -1662,5 +1712,132 @@ function fsReadStruct (filepath, callback) { //12/21/20 by DW -- from River6
 				}
 			});
 		});
+	}
+function buildParamList (params) { //12/20/22 by DW
+	var s = "";
+	for (var x in params) {
+		if (s.length > 0) {
+			s += "&";
+			}
+		s += x + "=" + encodeURIComponent (params [x]);
+		}
+	return (s);
+	}
+function getAllUrlParams (searchstring) { //5/19/23 by DW
+	var s = (searchstring === undefined) ? location.search : searchstring;
+	var allparams = new Object ();
+	if (beginsWith (s, "?")) {
+		s = stringDelete (s, 1, 1);
+		}
+	var splits = s.split ("&");
+	splits.forEach (function (item) {
+		var splits = item.split ("=");
+		allparams [splits [0] ] = decodeURIComponent (splits [1]); //5/19/23 by DW
+		});
+	return (allparams);
+	}
+function addToolTip (theObject, tipText, placement="right") { //5/24/23 by DW
+	theObject.attr ("data-container", "body"); //10/23/22 by DW
+	theObject.attr ("data-toggle", "tooltip");
+	theObject.attr ("data-placement", placement);
+	theObject.attr ("title", tipText);
+	theObject.click (function () { //11/1/22 by DW
+		theObject.tooltip ("hide");
+		});
+	theObject.tooltip (); //5/22/23 by DW
+	return (theObject);
+	}
+function setObjectHtml (theObject, theText) { //6/9/23 by DW
+	if (theObject.html () != theText) {
+		theObject.html (theText);
+		}
+	}
+function makeBlockVisible (theObject, flMakeVisible) { //6/9/23 by DW
+	if (theObject.css ("display") == "block") { //is it currently visible?
+		if (!flMakeVisible) {
+			theObject.css ("display", "none")
+			}
+		}
+	else {
+		if (flMakeVisible) {
+			theObject.css ("display", "block")
+			}
+		}
+	}
+function myConsoleLog (theLogMessage) { //10/11/23 by DW
+	const whenstring = new Date ().toLocaleTimeString ();
+	console.log (whenstring + " " + theLogMessage);
+	}
+function nowstring () { //2/17/24 by DW
+	return (new Date ().toLocaleTimeString ());
+	}
+function mergeOptions (userOptions, options) { //8/14/24 by DW
+	if (userOptions !== undefined) {
+		for (x in userOptions) {
+			if (userOptions [x] !== undefined) {
+				options [x] = userOptions [x];
+				}
+			}
+		}
+	}
+function readConfig (f, config, callback) { //8/14/24 by DW
+	fs.readFile (f, function (err, jsontext) {
+		if (!err) {
+			try {
+				var jstruct = JSON.parse (jsontext);
+				for (var x in jstruct) {
+					config [x] = jstruct [x];
+					}
+				}
+			catch (err) {
+				console.log ("readConfig: f == " + f + ", err.message == " + err.message);
+				}
+			}
+		callback ();
+		});
+	}
+function pathBeginsWithNumbers (path, struct) { //9/22/24 by DW
+	
+	struct.year = undefined;
+	struct.month = undefined;
+	struct.day = undefined;
+	struct.extension = undefined;
+	
+	if (beginsWith (path, "/")) {
+		path = stringDelete (path, 1, 1);
+		}
+	if (endsWith (path, "/")) {
+		path = stringMid (path, 1, path.length - 1);
+		}
+	const splits = path.split ("/");
+	
+	if ((splits.length == 0) || (splits.length > 3)) {
+		return (false);
+		}
+	
+	if (isNaN (splits [0])) {
+		return (false);
+		}
+	struct.year = Number (splits [0]);
+	
+	if (splits.length > 1) {
+		if (isNaN (splits [1])) {
+			return (false);
+			}
+		struct.month = Number (splits [1]);
+		}
+	if (splits.length > 2) {
+		const daypart = splits [2];
+		const daystring = stringNthField (daypart, ".", 1)
+		if (isNaN (daystring)) {
+			return (false);
+			}
+		struct.day = Number (daystring);
+		
+		const extension = stringNthField (daypart, ".", 2);
+		struct.extension = (extension.length == 0) ? undefined : extension;
+		}
+	
+	return (true);
 	}
 

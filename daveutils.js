@@ -1,4 +1,4 @@
-var myProductName = "daveutils", myVersion = "0.4.70";  
+var myProductName = "daveutils", myVersion = "0.4.71";  
 
 /*  The MIT License (MIT)
 	Copyright (c) 2014-2024 Dave Winer
@@ -100,6 +100,7 @@ exports.myConsoleLog = myConsoleLog; //10/11/23 by DW
 exports.mergeOptions = mergeOptions; //8/14/24 by DW
 exports.readConfig = readConfig; //8/14/24 by DW
 exports.pathBeginsWithNumbers = pathBeginsWithNumbers; //9/22/24 by DW
+exports.getObjectFromJsontext = getObjectFromJsontext; //10/21/24 by DW
 
 
 const fs = require ("fs");
@@ -1839,5 +1840,17 @@ function pathBeginsWithNumbers (path, struct) { //9/22/24 by DW
 		}
 	
 	return (true);
+	}
+function getObjectFromJsontext (jsontext, callback) { //10/21/24 by DW
+	var theObject;
+	try {
+		theObject = JSON.parse (jsontext);
+		}
+	catch (err) {
+		const message = "Can't add or update the post because the JSON text is not valid.";
+		callback ({message});
+		return (undefined);
+		}
+	return (theObject);
 	}
 

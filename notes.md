@@ -1,3 +1,5 @@
+* 10/21/24; 9:57:21 AM by DW
+   * Added getObjectFromJsontext.
 * 8/24/21 by DW
    * utils.httpExt2MIME now recognizes "opml" as an extension mapping it to text/xml.
 * 6/17/20 by DW

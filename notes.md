@@ -1,3 +1,5 @@
+* 12/28/24; 12:46:09 PM by DW
+   * Added optional param to getDomainFromUrl. 
 * 10/21/24; 9:57:21 AM by DW
    * Added getObjectFromJsontext.
 * 8/24/21 by DW

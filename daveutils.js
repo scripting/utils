@@ -1,4 +1,4 @@
-var myProductName = "daveutils", myVersion = "0.4.71";  
+var myProductName = "daveutils", myVersion = "0.4.73";  
 
 /*  The MIT License (MIT)
 	Copyright (c) 2014-2024 Dave Winer
@@ -101,6 +101,7 @@ exports.mergeOptions = mergeOptions; //8/14/24 by DW
 exports.readConfig = readConfig; //8/14/24 by DW
 exports.pathBeginsWithNumbers = pathBeginsWithNumbers; //9/22/24 by DW
 exports.getObjectFromJsontext = getObjectFromJsontext; //10/21/24 by DW
+exports.monthToString = monthToString; //10/28/24 by DW
 
 
 const fs = require ("fs");
@@ -746,9 +747,11 @@ function hotUpText (s, url) { //7/18/14 by DW
 	s = leftpart + linktext + rightpart;
 	return (s);
 	}
-function getDomainFromUrl (url) { //7/11/15 by DW
+function getDomainFromUrl (url, flRemoveDomainNoise=true) { //7/11/15 by DW
 	if ((url != null ) && (url != "")) {
-		url = url.replace("www.","").replace("www2.", "").replace("feedproxy.", "").replace("feeds.", "");
+		if (flRemoveDomainNoise) { //12/28/24 by DW
+			url = url.replace("www.","").replace("www2.", "").replace("feedproxy.", "").replace("feeds.", "");
+			}
 		var root = url.split('?')[0]; // cleans urls of form http://domain.com?a=1&b=2
 		url = root.split('/')[2];
 		}

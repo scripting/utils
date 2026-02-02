@@ -1,3 +1,220 @@
+var myProductName = "daveutils", myVersion = "0.4.74";  
+
+/*  The MIT License (MIT)
+	Copyright (c) 2014-2024 Dave Winer
+	
+	Permission is hereby granted, free of charge, to any person obtaining a copy
+	of this software and associated documentation files (the "Software"), to deal
+	in the Software without restriction, including without limitation the rights
+	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	copies of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
+	
+	The above copyright notice and this permission notice shall be included in all
+	copies or substantial portions of the Software.
+	
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+	SOFTWARE.
+	*/
+
+exports.beginsWith = beginsWith; 
+exports.endsWith = endsWith;
+exports.stringCountFields = stringCountFields;
+exports.stringDelete = stringDelete;
+exports.stringMid = stringMid;
+exports.padWithZeros = padWithZeros;
+exports.getDatePath = getDatePath;
+exports.secondsSince = secondsSince;
+exports.bumpUrlString = bumpUrlString;
+exports.stringContains = stringContains;
+exports.sameDay = sameDay;
+exports.sameMonth = sameMonth; //5/10/17 by DW
+exports.dayGreaterThanOrEqual = dayGreaterThanOrEqual; //5/10/17 by DW
+exports.jsonStringify = jsonStringify;
+exports.stringNthField = stringNthField;
+exports.getBoolean = getBoolean;
+exports.isAlpha = isAlpha;
+exports.isNumeric = isNumeric;
+exports.stringLastField = stringLastField;
+exports.multipleReplaceAll = multipleReplaceAll;
+exports.replaceAll = replaceAll; //2/17/15 by DW
+exports.kilobyteString = kilobyteString;
+exports.megabyteString = megabyteString;
+exports.gigabyteString = gigabyteString;
+exports.stringLower = stringLower;
+exports.stringUpper = stringUpper; //5/7/17 by DW
+exports.filledString = filledString;
+exports.innerCaseName = innerCaseName;
+exports.copyScalars = copyScalars;
+exports.stripMarkup = stripMarkup;
+exports.hotUpText = hotUpText;
+exports.sleepTillTopOfMinute = sleepTillTopOfMinute;
+exports.random = random;
+exports.stringPopLastField = stringPopLastField;
+exports.trimWhitespace = trimWhitespace;
+exports.dateYesterday = dateYesterday;
+exports.maxStringLength = maxStringLength;
+exports.stringPopExtension = stringPopExtension;
+exports.getFileModDate = getFileModDate;
+exports.getFacebookTimeString = getFacebookTimeString;
+exports.viewDate = viewDate;
+exports.sureFilePath = fsSureFilePath; //5/17/17 by DW
+exports.getRandomSnarkySlogan = getRandomSnarkySlogan; //5/24/17 by DW 
+exports.encodeXml = encodeXml; //5/24/17 by DW
+exports.trimLeading = trimLeading; //6/22/17 by DW
+exports.trimTrailing = trimTrailing; //6/22/17 by DW
+exports.stringInsert = stringInsert; //6/25/17 by DW
+exports.downloadBigFile = downloadBigFile; //7/22/17 by DW
+exports.httpExt2MIME = httpExt2MIME; //7/22/17 by DW
+exports.isFolder = fsIsFolder; //7/26/17 by DW
+exports.daysInMonth = daysInMonth; //7/31/17 by DW
+exports.sureFilePathSync = fsSureFilePathSync; //8/3/17 by DW
+exports.sureFolder = fsSureFolder; //8/3/17 by DW
+exports.runAtTopOfMinute = runAtTopOfMinute; //8/11/17 by DW
+exports.runEveryMinute = runEveryMinute; //9/4/18 by DW
+exports.visitDirectory = visitDirectory; //8/30/17 by DW
+exports.decodeXml = decodeXml; //1/10/18 by DW
+exports.isWhitespace = isWhitespace; //6/3/18 by DW
+exports.buildParamList = buildParamList; //9/22/18 by DW
+exports.equalStrings = equalStrings; //11/18/18 by DW
+exports.stringAddCommas = stringAddCommas; //1/28/19 by DW
+exports.urlSplitter = urlSplitter; //2/27/19 by DW
+exports.getRandomPassword = getRandomPassword; //8/17/19 by DW
+exports.howLongSinceStart = howLongSinceStart; //9/1/19 by DW 
+exports.howLongSinceStartAsString = howLongSinceStartAsString; //9/12/19 by DW 
+exports.getPermalinkString = getPermalinkString; //2/10/20 by DW
+exports.getDomainFromUrl = getDomainFromUrl; //8/10/20 by DW
+exports.getPermalinkString = getPermalinkString; //12/21/20 by DW -- from River6
+exports.endsWithChar = endsWithChar; //12/21/20 by DW -- from River6
+exports.getDomainName = getDomainName; //12/21/20 by DW -- from River6
+exports.equalDates = equalDates; //12/21/20 by DW -- from River6
+exports.fsWriteStruct = fsWriteStruct; //12/21/20 by DW -- from River6
+exports.fsReadStruct = fsReadStruct; //12/21/20 by DW -- from River6
+exports.isUndefined = isUndefined; //11/17/21 by DW
+exports.myConsoleLog = myConsoleLog; //10/11/23 by DW
+exports.mergeOptions = mergeOptions; //8/14/24 by DW
+exports.readConfig = readConfig; //8/14/24 by DW
+exports.pathBeginsWithNumbers = pathBeginsWithNumbers; //9/22/24 by DW
+exports.getObjectFromJsontext = getObjectFromJsontext; //10/21/24 by DW
+exports.monthToString = monthToString; //10/28/24 by DW
+exports.addPeriodAtEnd = addPeriodAtEnd; //1/2/25 by DW
+
+
+const fs = require ("fs");
+const request = require ("request"); //7/22/17 by DW
+
+// version 0.11 by Daniel Rench
+// More information: http://dren.ch/strftime/
+// This is public domain software
+
+Number.prototype.pad =
+	function (n,p) {
+		var s = '' + this;
+		p = p || '0';
+		while (s.length < n) s = p + s;
+		return s;
+	};
+
+Date.prototype.months = [
+		'January', 'February', 'March', 'April', 'May', 'June', 'July',
+		'August', 'September', 'October', 'November', 'December'
+	];
+Date.prototype.weekdays = [
+		'Sunday', 'Monday', 'Tuesday', 'Wednesday',
+		'Thursday', 'Friday', 'Saturday'
+	];
+Date.prototype.dpm = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+
+Date.prototype.strftime_f = {
+		A: function (d) { return d.weekdays[d.getDay()] },
+		a: function (d) { return d.weekdays[d.getDay()].substring(0,3) },
+		B: function (d) { return d.months[d.getMonth()] },
+		b: function (d) { return d.months[d.getMonth()].substring(0,3) },
+		C: function (d) { return Math.floor(d.getFullYear()/100); },
+		c: function (d) { return d.toString() },
+		D: function (d) {
+				return d.strftime_f.m(d) + '/' +
+					d.strftime_f.d(d) + '/' + d.strftime_f.y(d);
+			},
+		d: function (d) { return d.getDate().pad(2,'0') },
+		e: function (d) { return d.getDate().pad(2,' ') },
+		F: function (d) {
+				return d.strftime_f.Y(d) + '-' + d.strftime_f.m(d) + '-' +
+					d.strftime_f.d(d);
+			},
+		H: function (d) { return d.getHours().pad(2,'0') },
+		I: function (d) { return ((d.getHours() % 12 || 12).pad(2)) },
+		j: function (d) {
+				var t = d.getDate();
+				var m = d.getMonth() - 1;
+				if (m > 1) {
+					var y = d.getYear();
+					if (((y % 100) == 0) && ((y % 400) == 0)) ++t;
+					else if ((y % 4) == 0) ++t;
+				}
+				while (m > -1) t += d.dpm[m--];
+				return t.pad(3,'0');
+			},
+		k: function (d) { return d.getHours().pad(2,' ') },
+		l: function (d) { return ((d.getHours() % 12 || 12).pad(2,' ')) },
+		M: function (d) { return d.getMinutes().pad(2,'0') },
+		m: function (d) { return (d.getMonth()+1).pad(2,'0') },
+		n: function (d) { return "\n" },
+		p: function (d) { return (d.getHours() > 11) ? 'PM' : 'AM' },
+		R: function (d) { return d.strftime_f.H(d) + ':' + d.strftime_f.M(d) },
+		r: function (d) {
+				return d.strftime_f.I(d) + ':' + d.strftime_f.M(d) + ':' +
+					d.strftime_f.S(d) + ' ' + d.strftime_f.p(d);
+			},
+		S: function (d) { return d.getSeconds().pad(2,'0') },
+		s: function (d) { return Math.floor(d.getTime()/1000) },
+		T: function (d) {
+				return d.strftime_f.H(d) + ':' + d.strftime_f.M(d) + ':' +
+					d.strftime_f.S(d);
+			},
+		t: function (d) { return "\t" },
+/*		U: function (d) { return false }, */
+		u: function (d) { return(d.getDay() || 7) },
+/*		V: function (d) { return false }, */
+		v: function (d) {
+				return d.strftime_f.e(d) + '-' + d.strftime_f.b(d) + '-' +
+					d.strftime_f.Y(d);
+			},
+/*		W: function (d) { return false }, */
+		w: function (d) { return d.getDay() },
+		X: function (d) { return d.toTimeString() }, // wrong?
+		x: function (d) { return d.toDateString() }, // wrong?
+		Y: function (d) { return d.getFullYear() },
+		y: function (d) { return (d.getYear() % 100).pad(2) },
+//		Z: function (d) { return d.toString().match(/\((.+)\)$/)[1]; },
+//		z: function (d) { return d.getTimezoneOffset() }, // wrong
+//		z: function (d) { return d.toString().match(/\sGMT([+-]\d+)/)[1]; },
+		'%': function (d) { return '%' }
+	};
+
+Date.prototype.strftime_f['+'] = Date.prototype.strftime_f.c;
+Date.prototype.strftime_f.h = Date.prototype.strftime_f.b;
+
+Date.prototype.strftime =
+	function (fmt) {
+		var r = '';
+		var n = 0;
+		while(n < fmt.length) {
+			var c = fmt.substring(n, n+1);
+			if (c == '%') {
+				c = fmt.substring(++n, n+1);
+				r += (this.strftime_f[c]) ? this.strftime_f[c](this) : c;
+			} else r += c;
+			++n;
+		}
+		return r;
+	};
+
 function isUndefined (x) { //11/17/21 by DW -- don't just compare against undefined  
 	return ((x === undefined) || (x == null));
 	}
@@ -1752,3 +1969,4 @@ function runModalDialog (userOptions, callback) { //12/26/24 by DW
 	
 	return (theDialog); //modification -- 11/1/25 by DW
 	}
+

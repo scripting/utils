@@ -1,4 +1,4 @@
-var myProductName = "daveutils", myVersion = "0.4.74";  
+var myProductName = "daveutils", myVersion = "0.4.75";  
 
 /*  The MIT License (MIT)
 	Copyright (c) 2014-2024 Dave Winer
@@ -713,16 +713,43 @@ function encodeXml (s) { //7/15/14 by DW
 		return escaped;
 		}
 	}
-function decodeXml (s) { //7/5/18 by DW -- rewrite
-	var replacetable = {
-		lt: "<",
-		gt: ">",
-		amp: "&",
-		apos: "'"
-		};
-	s = multipleReplaceAll (s, replacetable, true, "&", ";");
-	return (s);
+
+function decodeXml (s, flComplete=false) { //7/5/18 by DW & 6/13/26 by DW
+	function simpleDecode (s) {
+		var replacetable = {
+			lt: "<",
+			gt: ">",
+			amp: "&",
+			apos: "'"
+			};
+		s = multipleReplaceAll (s, replacetable, true, "&", ";");
+		return (s);
+		}
+	function completeDecode (s) {
+		var replacetable = {
+			lt: "<",
+			gt: ">",
+			amp: "&",
+			apos: "'",
+			quot: "\""
+			};
+		s = multipleReplaceAll (s, replacetable, true, "&", ";");
+		s = s.replace (/&#[xX]([0-9a-fA-F]+);/g, function (theEntity, theHex) {
+			return (String.fromCodePoint (parseInt (theHex, 16)));
+			});
+		s = s.replace (/&#(\d+);/g, function (theEntity, theDigits) {
+			return (String.fromCodePoint (parseInt (theDigits, 10)));
+			});
+		return (s);
+		}
+	if (flComplete) {
+		return (completeDecode (s));
+		}
+	else {
+		return (simpleDecode (s));
+		}
 	}
+
 function hotUpText (s, url) { //7/18/14 by DW
 	
 	if (url === undefined) { //makes it easier to call -- 3/14/14 by DW
